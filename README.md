@@ -18,7 +18,7 @@
   Attempted to port to python 2.7 to support F5 appliances \
   Adjusted length of certificate to 100 characters max due to column out \
   Ignore special characters or non english characters \
-  Convert tree element to UTF8 for tree character support \
+  Convert tree element to UTF8 for tree character support 
   
   ## Installation:
   scp file to F5 or paste with vi
