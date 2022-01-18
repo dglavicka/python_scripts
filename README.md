@@ -12,7 +12,6 @@
   - [Additional Info](#additional-info)
 
   ## Description:
-  https://github.com/jkolezyn/cert_tree
   Taken from https://github.com/jkolezyn/cert_tree and ported to work for F5 Load balancers
   
   ## Release Notes
