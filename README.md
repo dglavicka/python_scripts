@@ -25,7 +25,7 @@
 
   ## Usage:
   Run from F5 shell \
-  python certchain.py </file/local/.pem> 
+  python certchainf5.py </file/local/.pem> 
    - Command switches: \
      -p = show positon of cert in file as denoted in second column between brackets \
      -e = show certificate expiration dates denote in third column with EXPIRED or valid until \
