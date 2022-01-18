@@ -15,7 +15,7 @@
   Taken from https://github.com/jkolezyn/cert_tree and ported to work for F5 Load balancers
   
   ## Release Notes
-  Attempted to port to python 2.7 to support F5 appliances
+  Attempted to port to python 2.7 to support F5 appliances \n
   Adjusted length of certificate to 100 characters max due to column out
   Ignore special characters or non english characters 
   Convert tree element to UTF8 for tree character support
