@@ -186,7 +186,7 @@ def print_cert_roots(roots, position, expiry):
     for e1, e2 in zip(printable_elements[0], printable_elements[1]):
         spaces = max_first - len(e1) 
         tabs = ' '*spaces
-	      e1 = e1[:100]
+	e1 = e1[:100]
         print (e1.encode("utf-8"), tabs.encode("utf-8"), e2.encode("utf-8"))
 
 def generate_tree_elements_to_print(root, level, printable_elements, spaces_for_level = 4, last = False, position = False, expiry = False):
