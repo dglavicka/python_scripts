@@ -1,0 +1,15 @@
+        Issuer: OU=GlobalSign ECC Root CA - R5, O=GlobalSign, CN=GlobalSign
+            Not After : Jan 19 03:14:07 2038 GMT
+        Subject: OU=GlobalSign ECC Root CA - R5, O=GlobalSign, CN=GlobalSign
+        Issuer: C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2
+        Subject: C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2
+        Issuer: C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2
+        Subject: C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., CN=Starfield Services Root Certificate Authority - G2
+        Issuer: C=US, O=Starfield Technologies, Inc., OU=Starfield Class 2 Certification Authority
+        Subject: C=US, ST=Arizona, L=Scottsdale, O=Starfield Technologies, Inc., OU=https://certs.starfieldtech.com/repository/, CN=Starfield Root Certificate Authority - G2
+        Issuer: OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign
+            Not After : Mar 18 10:00:00 2029 GMT
+        Subject: OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign
+        Issuer: OU=GlobalSign Root CA - R3, O=GlobalSign, CN=GlobalSign
+            Not After : Sep 21 00:00:00 2026 GMT
+        Subject: C=BE, O=GlobalSign nv-sa, CN=GlobalSign Extended Validation CA - SHA256 - G3
