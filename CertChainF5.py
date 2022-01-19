@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Poorly ported to 2.7 to support F5 LBs
 from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 __author__  = "Jacek Kolezynski"
 __version__ = "0.0.3"
+import io
 import textwrap
 import argparse
 from datetime import datetime, timedelta
@@ -67,21 +67,19 @@ class Cert:
     
     def add_child(self, child):
         self.children.append(child)
-        
+
 
 def extract_certs_as_strings(cert_file):
     certs = []
-    with codecs.open(cert_file,'rU',encoding="utf-8",errors="replace") as whole_cert:
+    with io.open(cert_file) as whole_cert:
         cert_started = False
         content = ''
         for line in whole_cert:
-            #line = line.encode('utf-16','ignore')
-            #line = line.decode('utf-8','ignore')
             if '-----BEGIN CERTIFICATE-----' in line:
-                if not cert_started:
+               if not cert_started:
                     content += line
                     cert_started = True
-                else:
+               else:
                     print('Error, start cert found but already started')
                     sys.exit(1)
             elif '-----END CERTIFICATE-----' in line:
@@ -108,22 +106,27 @@ def create_certs(certs_contents):
     for content in certs_contents:
         certs.append(create_cert(content, position))
         position += 1
+    print(position)
     return certs
 
 def create_cert(cert_content, position):
     proc = subprocess.Popen(['openssl', 'x509', '-text'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, _ = proc.communicate(cert_content.encode())
-
     subject = ''
     issuer = ''
     date = None
     for line in out.decode(encoding='ascii', errors='replace').split('\n'):
-        match = re.match("^\s*(\w*): .*CN ?= ?(.*)$", line)
+        #line = line.encode('utf-8')
+        match = re.match("^\s*(\w*):(.*)", line)
         if match:
             if match.group(1) == 'Subject':
                 subject = match.group(2)
             elif match.group(1) == 'Issuer':
                 issuer = match.group(2)
+            #if match.group(3) == 'Subject':
+            #    subject = match.group(4)
+            #elif match.group(3) == 'Issuer':
+            #    issuer = match.group(4)
         else:
             m = re.match("^\s*Not After\s?: (?P<date>.*)GMT$", line)
             if m:
@@ -182,11 +185,14 @@ def print_cert_roots(roots, position, expiry):
     for e in printable_elements[0]:
         max_first = max(max_first, len(e))
         if max_first > 100:
-	      max_first = 100
+	  max_first = 100
     for e1, e2 in zip(printable_elements[0], printable_elements[1]):
         spaces = max_first - len(e1) 
-        tabs = ' '*spaces
+        tabs = " "*spaces
+	e1space = len(e1) - len(e1.lstrip())
+        #e1 = textwrap.fill(e1, width=80, subsequent_indent="  ")
 	e1 = e1[:100]
+        #e1 = re.sub("(.{75})", "\\1\n", e1, 0, re.DOTALL)
         print (e1.encode("utf-8"), tabs.encode("utf-8"), e2.encode("utf-8"))
 
 def generate_tree_elements_to_print(root, level, printable_elements, spaces_for_level = 4, last = False, position = False, expiry = False):
@@ -194,6 +200,7 @@ def generate_tree_elements_to_print(root, level, printable_elements, spaces_for_
     prefix = ' '*prefix_spaces
     if level == 0:
         str(prefix).encode("utf-8").decode("utf-8")
+        #prefix = repr(prefix).encode('utf-8')
         prefix += '\u2501'
     else:
         if last:
@@ -252,11 +259,11 @@ def main():
         return
 
     certs = create_certs(certs)
+    #print("After create_certs:", len(certs))
     roots = construct_tree(certs)
     print_cert_roots(roots, args.position, args.expiry)
     if args.remove_expired:
         print_roots_content(roots)
-
 
 if __name__ == '__main__':
     main()
