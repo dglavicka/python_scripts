@@ -14,6 +14,7 @@ import subprocess
 import sys
 import os
 import subprocess
+import pprint
 try:
     from subprocess import CompletedProcess
 except ImportError:
@@ -80,6 +81,7 @@ def extract_certs_as_strings(cert_file):
                     content += line
                     cert_started = True
                else:
+                    print(line)
                     print('Error, start cert found but already started')
                     sys.exit(1)
             elif '-----END CERTIFICATE-----' in line:
@@ -106,7 +108,6 @@ def create_certs(certs_contents):
     for content in certs_contents:
         certs.append(create_cert(content, position))
         position += 1
-    print(position)
     return certs
 
 def create_cert(cert_content, position):
@@ -116,7 +117,6 @@ def create_cert(cert_content, position):
     issuer = ''
     date = None
     for line in out.decode(encoding='ascii', errors='replace').split('\n'):
-        #line = line.encode('utf-8')
         match = re.match("^\s*(\w*):(.*)", line)
         if match:
             if match.group(1) == 'Subject':
@@ -131,20 +131,19 @@ def create_cert(cert_content, position):
             m = re.match("^\s*Not After\s?: (?P<date>.*)GMT$", line)
             if m:
                 date = datetime.strptime(m.group(1).strip(), '%b %d %H:%M:%S %Y')
-
     return Cert(subject, issuer, cert_content, expiry=date, position=position)
 
 
 def construct_tree(certs):
     roots_dir = {} # stores only root certs here
-    issuers_dir = {c.subject : c for c in certs} 
+    issuers_dir = {c.subject : c for c in certs}
     for c in certs:
         if c.subject in roots_dir:
-            c = roots_dir[c.subject]
+            if c.subject == c.issuer:    
+                c = roots_dir[c.subject]
             # this is not self-signed cert, but was added temporarily to roots by other cert as missing parent
-            c.missing = False
-            del roots_dir[c.subject]   
-        
+                c.missing = False
+                del roots_dir[c.subject]   
         if c.subject == c.issuer:
             # this is self-signed cert, lets add it to roots
             roots_dir[c.issuer] = c
@@ -160,18 +159,16 @@ def construct_tree(certs):
                 missing_root = Cert(c.issuer, 'Unknown issuer', '', missing=True)
                 roots_dir[c.issuer] = missing_root
                 missing_root.add_child(c)
-
     return [r for r in roots_dir.values()]
 
 def print_roots_content(roots):
     for root in roots:        
-        print_cert_content(root)
-
+         print_cert_content(root)
 
 def print_cert_content(root):
     now = datetime.now()
     if not root.missing and root.expiry and now < root.expiry:
-        print(root.content, end='', file=sys.stderr)
+        print(root.content, end='\r\n', file=sys.stderr)
     for c in root.children:
         print_cert_content(c)
 
@@ -240,6 +237,7 @@ def main():
     parser.add_argument('-p', '--position', action='store_true', help="show position of cert in file")
     parser.add_argument('-e', '--expiry', action='store_true', help="show expiry date")
     parser.add_argument('-r', '--remove_expired', action='store_true', help="remove expired certs and output the good ones to stderr")
+    parser.add_argument('-o', '--outfile', help="name of file to store good certs after remove_expired parse")    
 
     args = parser.parse_args()
     cert_file = args.cert_file
@@ -257,13 +255,17 @@ def main():
     if not certs:
         print('No certs found in the pem file')
         return
-
     certs = create_certs(certs)
-    #print("After create_certs:", len(certs))
     roots = construct_tree(certs)
     print_cert_roots(roots, args.position, args.expiry)
-    if args.remove_expired:
-        print_roots_content(roots)
+    if args.outfile:
+         fopen = open(args.outfile, 'w')
+         sys.stderr = fopen
+    if args.remove_expired: 
+         print_roots_content(roots)
+    if args.outfile:
+         fopen.close()
+
 
 if __name__ == '__main__':
     main()
